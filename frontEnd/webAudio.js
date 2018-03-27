@@ -45,8 +45,8 @@ function Play() {
     gainNode.gain.setValueAtTime(0, track1Start);
     console.log("start Time: " + context.currentTime);
     gainNode.gain.linearRampToValueAtTime(1, track1Start + fadeDuration);
-	
-	setTimeout(Crossfade, 1000);
+
+    setTimeout(Crossfade, 1000);
   }
 }
 
@@ -54,37 +54,37 @@ var timeOfStart;
 
 
 function Crossfade() {
-	console.log('crossfade');
+  console.log('crossfade function');
   var request = new XMLHttpRequest();
 
   request.open('GET', 'http://localhost:8080/cosine_110hz.wav', true);
   request.responseType = 'arraybuffer';
   request.onload = function() {
-  context.decodeAudioData(request.response, function(buffer) {
-  
-		console.log("crossfade");
-		let track1Start = timeOfStart;
-		let fadeDuration = .2599999;
-		let fadeOutStart = track1Start;
+    context.decodeAudioData(request.response, function(buffer) {
 
-		gainNode.gain.setValueAtTime(1, context.currentTime);
-		gainNode.gain.linearRampToValueAtTime(0, context.currentTime + fadeDuration);
-		source.stop(context.currentTime + fadeDuration);
+      console.log("track received.");
+      let track1Start = context.currentTime + .10;
+      let fadeDuration = .25;
+      let fadeOutStart = track1Start;
 
-		var gainNode2 = context.createGain();
-		var source2 = context.createBufferSource();
-		source2.buffer = buffer;
-		source2.connect(gainNode2);
-		gainNode2.connect(context.destination);
+      gainNode.gain.setValueAtTime(1, track1Start);
+      gainNode.gain.linearRampToValueAtTime(0, track1Start + fadeDuration);
+      source.stop(track1Start + fadeDuration);
 
-		source2.start(context.currentTime, 1.9999999);
-		gainNode2.gain.setValueAtTime(0, context.currentTime);
-		gainNode2.gain.linearRampToValueAtTime(1, context.currentTime + fadeDuration);
-  
-		gainNode = gainNode2;
-		source = source2;
-		setTimeout(Crossfade, 1000);
-      }
-	  )
-    }
+      var gainNode2 = context.createGain();
+      var source2 = context.createBufferSource();
+      source2.buffer = buffer;
+      source2.connect(gainNode2);
+      gainNode2.connect(context.destination);
+
+      source2.start(track1Start, 0);
+      gainNode2.gain.setValueAtTime(0, track1Start);
+      gainNode2.gain.linearRampToValueAtTime(1, track1Start + fadeDuration);
+
+      gainNode = gainNode2;
+      source = source2;
+      setTimeout(Crossfade, 1000);
+    })
+  }
+  request.send();
 }
