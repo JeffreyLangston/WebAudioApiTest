@@ -63,24 +63,27 @@ function Crossfade() {
     context.decodeAudioData(request.response, function(buffer) {
 
       console.log("track received.");
-      let track1Start = context.currentTime + .10;
+      let track1Start = timeOfStart + 1 + .10;
       let fadeDuration = .25;
       let fadeOutStart = track1Start;
+      var gainNode2 = context.createGain();
+      var source2 = context.createBufferSource();
+
+      source2.buffer = buffer;
+      source2.connect(gainNode2);
+      gainNode2.connect(context.destination);
+
 
       gainNode.gain.setValueAtTime(1, track1Start);
       gainNode.gain.linearRampToValueAtTime(0, track1Start + fadeDuration);
       source.stop(track1Start + fadeDuration);
 
-      var gainNode2 = context.createGain();
-      var source2 = context.createBufferSource();
-      source2.buffer = buffer;
-      source2.connect(gainNode2);
-      gainNode2.connect(context.destination);
 
-      source2.start(track1Start, 0);
       gainNode2.gain.setValueAtTime(0, track1Start);
       gainNode2.gain.linearRampToValueAtTime(1, track1Start + fadeDuration);
+      source2.start(track1Start, 0);
 
+      timeOfStart = track1Start;
       gainNode = gainNode2;
       source = source2;
       setTimeout(Crossfade, 1000);
