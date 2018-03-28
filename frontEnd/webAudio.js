@@ -63,7 +63,7 @@ function Crossfade() {
     context.decodeAudioData(request.response, function(buffer) {
 
       console.log("track received.");
-      let track1Start = timeOfStart + 1 + .10;
+      let track1Start = context.currentTime + 1 + .10;
       let fadeDuration = .25;
       let fadeOutStart = track1Start;
       var gainNode2 = context.createGain();
